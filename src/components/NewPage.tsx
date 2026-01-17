@@ -34,40 +34,40 @@ export function NewPage() {
 
     mm.add("(min-width: 768px)", () => {
       // Fixed scattered positions in hero (nice spread-out pattern)
-      // These positions are relative to the hero section center
+      // Opacity strongly correlates with size for depth effect: larger = more opacity
       const scatteredPositions: Array<{ x: number; y: number; scale: number; opacity: number }> = [
-        // Top row - far spread
-        { x: -1000, y: -450, scale: 0.18, opacity: 0.27 },
-        { x: -700, y: -480, scale: 0.22, opacity: 0.33 },
-        { x: -400, y: -420, scale: 0.20, opacity: 0.30 },
-        { x: -100, y: -500, scale: 0.16, opacity: 0.24 },
-        { x: 200, y: -450, scale: 0.25, opacity: 0.375 },
-        { x: 500, y: -480, scale: 0.19, opacity: 0.285 },
-        { x: 800, y: -420, scale: 0.23, opacity: 0.345 },
-        { x: 1100, y: -500, scale: 0.17, opacity: 0.255 },
+        // Top row - smaller images = less opacity (background/far away)
+        { x: -1000, y: -450, scale: 0.10, opacity: 0.10 },
+        { x: -700, y: -480, scale: 0.14, opacity: 0.19 },
+        { x: -400, y: -420, scale: 0.12, opacity: 0.14 },
+        { x: -100, y: -500, scale: 0.08, opacity: 0.08 },
+        { x: 200, y: -450, scale: 0.18, opacity: 0.30 },
+        { x: 500, y: -480, scale: 0.11, opacity: 0.13 },
+        { x: 800, y: -420, scale: 0.15, opacity: 0.22 },
+        { x: 1100, y: -500, scale: 0.09, opacity: 0.10 },
         
         // Middle-upper row
-        { x: -950, y: -150, scale: 0.21, opacity: 0.315 },
-        { x: -600, y: -200, scale: 0.24, opacity: 0.36 },
-        { x: -250, y: -180, scale: 0.27, opacity: 0.405 },
-        { x: 100, y: -220, scale: 0.20, opacity: 0.30 },
-        { x: 450, y: -160, scale: 0.26, opacity: 0.39 },
-        { x: 750, y: -190, scale: 0.22, opacity: 0.33 },
-        { x: 1050, y: -170, scale: 0.19, opacity: 0.285 },
+        { x: -950, y: -150, scale: 0.13, opacity: 0.17 },
+        { x: -600, y: -200, scale: 0.16, opacity: 0.25 },
+        { x: -250, y: -180, scale: 0.19, opacity: 0.33 },
+        { x: 100, y: -220, scale: 0.12, opacity: 0.14 },
+        { x: 450, y: -160, scale: 0.18, opacity: 0.30 },
+        { x: 750, y: -190, scale: 0.14, opacity: 0.19 },
+        { x: 1050, y: -170, scale: 0.11, opacity: 0.13 },
         
-        // Middle-lower row
-        { x: -850, y: 200, scale: 0.25, opacity: 0.375 },
-        { x: -500, y: 150, scale: 0.28, opacity: 0.42 },
-        { x: -150, y: 180, scale: 0.23, opacity: 0.345 },
-        { x: 200, y: 220, scale: 0.30, opacity: 0.45 },
-        { x: 550, y: 170, scale: 0.26, opacity: 0.39 },
-        { x: 900, y: 190, scale: 0.24, opacity: 0.36 },
+        // Middle-lower row - larger images = more opacity (foreground/closer)
+        { x: -850, y: 200, scale: 0.17, opacity: 0.28 },
+        { x: -500, y: 150, scale: 0.20, opacity: 0.38 },
+        { x: -150, y: 180, scale: 0.15, opacity: 0.22 },
+        { x: 200, y: 220, scale: 0.22, opacity: 0.44 },
+        { x: 550, y: 170, scale: 0.18, opacity: 0.30 },
+        { x: 900, y: 190, scale: 0.16, opacity: 0.25 },
         
         // Bottom row
-        { x: -750, y: 450, scale: 0.21, opacity: 0.315 },
-        { x: -350, y: 480, scale: 0.27, opacity: 0.405 },
-        { x: 50, y: 500, scale: 0.22, opacity: 0.33 },
-        { x: 450, y: 470, scale: 0.25, opacity: 0.375 },
+        { x: -750, y: 450, scale: 0.13, opacity: 0.17 },
+        { x: -350, y: 480, scale: 0.19, opacity: 0.33 },
+        { x: 50, y: 500, scale: 0.14, opacity: 0.19 },
+        { x: 450, y: 470, scale: 0.17, opacity: 0.28 },
       ]
 
       // Sort positions by x coordinate (left to right) so rightmost stays rightmost
@@ -130,6 +130,8 @@ export function NewPage() {
       })
 
       // Separate trigger to start infinite scroll after cards are fully in view
+      let scrollAnimations: gsap.core.Tween[] = []
+      
       ScrollTrigger.create({
         trigger: tradesSectionRef.current,
         start: "center center",
@@ -137,16 +139,22 @@ export function NewPage() {
           // Start infinite scroll only when section is centered - pure 2D
           tradeImageRefs.current.forEach((ref) => {
             if (ref) {
-              gsap.to(ref, {
+              const anim = gsap.to(ref, {
                 x: "-=2000",
-                duration: 30,
+                duration: 60, // Increased from 30 to 60 seconds for slower scroll
                 ease: "none",
                 repeat: -1,
                 repeatDelay: 0,
                 force3D: false, // Disable 3D transforms
               })
+              scrollAnimations.push(anim)
             }
           })
+        },
+        onLeaveBack: () => {
+          // Stop infinite scroll when scrolling back up
+          scrollAnimations.forEach(anim => anim.pause())
+          scrollAnimations = []
         },
       })
 
