@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from "react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { SectionHeader } from "@/components/ui/sectionheader"
 import { InputWithButton } from "@/components/ui/input-with-button"
 import { Input } from "@/components/ui/input"
@@ -7,13 +9,14 @@ import { Button } from "@/components/ui/button"
 import { Testimonial } from "@/components/ui/testimonial"
 
 export function NewPage() {
-  const [scrollY, setScrollY] = useState(0)
   const [visibleCards, setVisibleCards] = useState<boolean[]>([false, false, false, false])
   const [isSection2Visible, setIsSection2Visible] = useState(false)
   const [lineCoords, setLineCoords] = useState({ x1: 0, x2: 0, y: 0, length: 0 })
   const [centeredTestimonial, setCenteredTestimonial] = useState<number | null>(1)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const section2Ref = useRef<HTMLDivElement | null>(null)
+  const tradeImageRefs = useRef<(HTMLDivElement | null)[]>([])
+  const tradesSectionRef = useRef<HTMLDivElement | null>(null)
   const applyRef = useRef<HTMLButtonElement | null>(null)
   const approvedRef = useRef<HTMLButtonElement | null>(null)
   const earningRef = useRef<HTMLButtonElement | null>(null)
@@ -21,13 +24,141 @@ export function NewPage() {
   const testimonialRefs = useRef<(HTMLDivElement | null)[]>([])
   const testimonialContainerRef = useRef<HTMLDivElement | null>(null)
 
+  // GSAP ScrollTrigger animation for hero images to cards transformation
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY)
-    }
+    gsap.registerPlugin(ScrollTrigger)
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    if (!tradesSectionRef.current || tradeImageRefs.current.length === 0) return
+
+    const mm = gsap.matchMedia()
+
+    mm.add("(min-width: 768px)", () => {
+      // Fixed scattered positions in hero (nice spread-out pattern)
+      // These positions are relative to the hero section center
+      const scatteredPositions: Array<{ x: number; y: number; scale: number; opacity: number }> = [
+        // Top row - far spread
+        { x: -1000, y: -450, scale: 0.18, opacity: 0.27 },
+        { x: -700, y: -480, scale: 0.22, opacity: 0.33 },
+        { x: -400, y: -420, scale: 0.20, opacity: 0.30 },
+        { x: -100, y: -500, scale: 0.16, opacity: 0.24 },
+        { x: 200, y: -450, scale: 0.25, opacity: 0.375 },
+        { x: 500, y: -480, scale: 0.19, opacity: 0.285 },
+        { x: 800, y: -420, scale: 0.23, opacity: 0.345 },
+        { x: 1100, y: -500, scale: 0.17, opacity: 0.255 },
+        
+        // Middle-upper row
+        { x: -950, y: -150, scale: 0.21, opacity: 0.315 },
+        { x: -600, y: -200, scale: 0.24, opacity: 0.36 },
+        { x: -250, y: -180, scale: 0.27, opacity: 0.405 },
+        { x: 100, y: -220, scale: 0.20, opacity: 0.30 },
+        { x: 450, y: -160, scale: 0.26, opacity: 0.39 },
+        { x: 750, y: -190, scale: 0.22, opacity: 0.33 },
+        { x: 1050, y: -170, scale: 0.19, opacity: 0.285 },
+        
+        // Middle-lower row
+        { x: -850, y: 200, scale: 0.25, opacity: 0.375 },
+        { x: -500, y: 150, scale: 0.28, opacity: 0.42 },
+        { x: -150, y: 180, scale: 0.23, opacity: 0.345 },
+        { x: 200, y: 220, scale: 0.30, opacity: 0.45 },
+        { x: 550, y: 170, scale: 0.26, opacity: 0.39 },
+        { x: 900, y: 190, scale: 0.24, opacity: 0.36 },
+        
+        // Bottom row
+        { x: -750, y: 450, scale: 0.21, opacity: 0.315 },
+        { x: -350, y: 480, scale: 0.27, opacity: 0.405 },
+        { x: 50, y: 500, scale: 0.22, opacity: 0.33 },
+        { x: 450, y: 470, scale: 0.25, opacity: 0.375 },
+      ]
+
+      // Sort positions by x coordinate (left to right) so rightmost stays rightmost
+      scatteredPositions.sort((a, b) => a.x - b.x)
+
+      // Calculate final grid positions (25 images in a single row with proper spacing)
+      const cardWidth = 240
+      const gap = 32 // Increased gap to ensure images don't touch
+      const totalWidth = (cardWidth * 25) + (gap * 24)
+      const startX = -totalWidth / 2 + cardWidth / 2
+
+      // Get the actual position of the trades section
+      const tradesSection = tradesSectionRef.current
+      if (!tradesSection) return
+
+      const sectionTop = tradesSection.offsetTop
+      const heroHeight = window.innerHeight // Hero is min-h-screen
+      const finalY = sectionTop - heroHeight / 2 + 300 // Position relative to initial center (increased to 300)
+
+      // Set initial scattered state (in hero section) - pure 2D
+      tradeImageRefs.current.forEach((ref, index) => {
+        if (ref && index < 25) {
+          const pos = scatteredPositions[index]
+          gsap.set(ref, {
+            x: pos.x,
+            y: pos.y,
+            scale: pos.scale,
+            opacity: pos.opacity,
+            force3D: false, // Disable 3D transforms
+          })
+        }
+      })
+
+      // Create scroll-triggered animation timeline for organizing cards
+      const organizeTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top", // Start immediately when page scroll begins
+          end: () => `+=${tradesSectionRef.current?.offsetTop || 1000}`, // End when reaching trades section
+          scrub: 1, // Smooth scrubbing
+          markers: false,
+        }
+      })
+
+      // Animate each image to its final grid position in second section - pure 2D, smoother
+      tradeImageRefs.current.forEach((ref, index) => {
+        if (ref && index < 25) {
+          const finalX = startX + (index * (cardWidth + gap))
+          
+          organizeTl.to(ref, {
+            x: finalX,
+            y: finalY, // Position dynamically calculated based on section position
+            scale: 1,
+            opacity: 1,
+            ease: "power2.out", // Smoother easing
+            duration: 2, // Longer duration for smoother animation
+            force3D: false, // Disable 3D transforms
+          }, index * 0.015) // Reduced stagger for smoother flow
+        }
+      })
+
+      // Separate trigger to start infinite scroll after cards are fully in view
+      ScrollTrigger.create({
+        trigger: tradesSectionRef.current,
+        start: "center center",
+        onEnter: () => {
+          // Start infinite scroll only when section is centered - pure 2D
+          tradeImageRefs.current.forEach((ref) => {
+            if (ref) {
+              gsap.to(ref, {
+                x: "-=2000",
+                duration: 30,
+                ease: "none",
+                repeat: -1,
+                repeatDelay: 0,
+                force3D: false, // Disable 3D transforms
+              })
+            }
+          })
+        },
+      })
+
+      return () => {
+        organizeTl.kill()
+      }
+    })
+
+    return () => {
+      mm.kill()
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+    }
   }, [])
 
   useEffect(() => {
@@ -211,82 +342,90 @@ export function NewPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#faf9f5] relative">
-      {/* Random person avatars scattered in 3D */}
-      <div className="absolute inset-x-0 top-0 h-[calc(100vh+600px)] overflow-hidden">
-        <svg 
-          className="w-full h-full" 
-          viewBox="0 0 1920 1080" 
-          preserveAspectRatio="xMidYMid slice"
-          style={{
-            transform: `translateY(${-scrollY * 0.5}px)`,
-            opacity: Math.max(0, 1 - scrollY / 500)
-          }}
-        >
-          <defs>
-            {/* Blur filters for depth */}
-            <filter id="blur-light"><feGaussianBlur stdDeviation="1" /></filter>
-            <filter id="blur-medium"><feGaussianBlur stdDeviation="2" /></filter>
-            <filter id="blur-strong"><feGaussianBlur stdDeviation="3" /></filter>
-            {/* Clip paths for rounded corners */}
-            <clipPath id="clip-12" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-14" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-16" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-18" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-20" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-22" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-24" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-26" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-28" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-30" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-32" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-34" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-36" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-38" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-            <clipPath id="clip-40" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="1" height="1" rx="0.25" ry="0.25" /></clipPath>
-          </defs>
-          {/* Randomly scattered person avatars - smaller behind (lower opacity), foreground normal size */}
-          <image x="150" y="120" width="40" height="40" href="/contractors/22bd86e4bfc5e1aaaf264e774c349dff.jpg" opacity="0.85" clipPath="url(#clip-32)" />
-          <image x="320" y="450" width="18" height="18" href="/contractors/56fe20dc1463de687448f7b05c5b9504.jpg" opacity="0.25" clipPath="url(#clip-14)" filter="url(#blur-strong)" />
-          <image x="780" y="200" width="48" height="48" href="/contractors/8abdf0e7b39201eab5992d6557bc1f0e.jpg" opacity="0.95" clipPath="url(#clip-38)" />
-          <image x="1050" y="600" width="15" height="15" href="/contractors/aa9c5fdbb24369cae69be61a261a1671.jpg" opacity="0.2" clipPath="url(#clip-12)" filter="url(#blur-strong)" />
-          <image x="1350" y="180" width="45" height="45" href="/contractors/dc7ff51544b30db18f55c8ea63e635c0.jpg" opacity="0.9" clipPath="url(#clip-36)" />
-          <image x="1650" y="500" width="20" height="20" href="/contractors/dd745b0b0d6b5b434a383352f9cdc035.jpg" opacity="0.3" clipPath="url(#clip-16)" filter="url(#blur-medium)" />
-          <image x="250" y="700" width="30" height="30" href="/contractors/f36a8260df200c4b9da22216617ee32c.jpg" opacity="0.5" clipPath="url(#clip-24)" filter="url(#blur-light)" />
-          <image x="550" y="350" width="50" height="50" href="/contractors/22bd86e4bfc5e1aaaf264e774c349dff.jpg" opacity="1.0" clipPath="url(#clip-40)" />
-          <image x="950" y="800" width="15" height="15" href="/contractors/56fe20dc1463de687448f7b05c5b9504.jpg" opacity="0.2" clipPath="url(#clip-12)" filter="url(#blur-strong)" />
-          <image x="1200" y="100" width="45" height="45" href="/contractors/8abdf0e7b39201eab5992d6557bc1f0e.jpg" opacity="0.92" clipPath="url(#clip-36)" />
-          <image x="1750" y="300" width="28" height="28" href="/contractors/aa9c5fdbb24369cae69be61a261a1671.jpg" opacity="0.45" clipPath="url(#clip-22)" filter="url(#blur-light)" />
-          <image x="450" y="550" width="35" height="35" href="/contractors/dc7ff51544b30db18f55c8ea63e635c0.jpg" opacity="0.55" clipPath="url(#clip-28)" filter="url(#blur-light)" />
-          <image x="850" y="400" width="43" height="43" href="/contractors/dd745b0b0d6b5b434a383352f9cdc035.jpg" opacity="0.75" clipPath="url(#clip-34)" />
-          <image x="1400" y="750" width="18" height="18" href="/contractors/f36a8260df200c4b9da22216617ee32c.jpg" opacity="0.25" clipPath="url(#clip-14)" filter="url(#blur-medium)" />
-          <image x="1100" y="280" width="50" height="50" href="/contractors/22bd86e4bfc5e1aaaf264e774c349dff.jpg" opacity="0.98" clipPath="url(#clip-40)" />
-          <image x="600" y="650" width="23" height="23" href="/contractors/56fe20dc1463de687448f7b05c5b9504.jpg" opacity="0.3" clipPath="url(#clip-18)" filter="url(#blur-medium)" />
-          <image x="200" y="280" width="38" height="38" href="/contractors/8abdf0e7b39201eab5992d6557bc1f0e.jpg" opacity="0.65" clipPath="url(#clip-30)" filter="url(#blur-light)" />
-          <image x="1550" y="180" width="43" height="43" href="/contractors/aa9c5fdbb24369cae69be61a261a1671.jpg" opacity="0.8" clipPath="url(#clip-34)" />
-          <image x="750" y="680" width="15" height="15" href="/contractors/dc7ff51544b30db18f55c8ea63e635c0.jpg" opacity="0.22" clipPath="url(#clip-12)" filter="url(#blur-strong)" />
-          <image x="1300" y="420" width="33" height="33" href="/contractors/dd745b0b0d6b5b434a383352f9cdc035.jpg" opacity="0.5" clipPath="url(#clip-26)" filter="url(#blur-light)" />
-          <image x="380" y="180" width="48" height="48" href="/contractors/f36a8260df200c4b9da22216617ee32c.jpg" opacity="0.88" clipPath="url(#clip-38)" />
-          <image x="980" y="550" width="25" height="25" href="/contractors/22bd86e4bfc5e1aaaf264e774c349dff.jpg" opacity="0.35" clipPath="url(#clip-20)" filter="url(#blur-medium)" />
-          <image x="1680" y="650" width="30" height="30" href="/contractors/56fe20dc1463de687448f7b05c5b9504.jpg" opacity="0.48" clipPath="url(#clip-24)" filter="url(#blur-light)" />
-          <image x="520" y="220" width="40" height="40" href="/contractors/8abdf0e7b39201eab5992d6557bc1f0e.jpg" opacity="0.72" clipPath="url(#clip-32)" />
-          <image x="1450" y="380" width="20" height="20" href="/contractors/aa9c5fdbb24369cae69be61a261a1671.jpg" opacity="0.28" clipPath="url(#clip-16)" filter="url(#blur-medium)" />
-        </svg>
+    <div className="min-h-screen bg-[#faf9f5] relative overflow-hidden">
+      {/* Scattered contractor images that will transform into cards - at root level to traverse sections */}
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
+        {[...Array(25)].map((_, index) => {
+          const contractorImages = [
+            '/contractors/22bd86e4bfc5e1aaaf264e774c349dff.jpg',
+            '/contractors/56fe20dc1463de687448f7b05c5b9504.jpg',
+            '/contractors/8abdf0e7b39201eab5992d6557bc1f0e.jpg',
+            '/contractors/aa9c5fdbb24369cae69be61a261a1671.jpg',
+            '/contractors/dc7ff51544b30db18f55c8ea63e635c0.jpg',
+            '/contractors/dd745b0b0d6b5b434a383352f9cdc035.jpg',
+            '/contractors/f36a8260df200c4b9da22216617ee32c.jpg',
+          ]
+          const tradeNames = [
+            'Handyman',
+            'Plumber',
+            'Technician',
+            'Electrician',
+            'Painter',
+            'Carpenter',
+            'Roofer',
+          ]
+          
+          return (
+            <div
+              key={index}
+              ref={(el) => { tradeImageRefs.current[index] = el }}
+              className="absolute"
+              style={{ 
+                transformOrigin: 'center center',
+                left: '50%',
+                top: '50vh', // Start at 50% of viewport height (hero section center)
+                width: '240px',
+              }}
+            >
+              <div className="overflow-hidden rounded-xl w-full">
+                <img 
+                  src={contractorImages[index % contractorImages.length]} 
+                  alt={tradeNames[index % tradeNames.length]}
+                  className="w-full h-auto object-contain block"
+                  draggable="false"
+                  style={{ display: 'block' }}
+                />
+              </div>
+            </div>
+          )
+        })}
       </div>
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-8">
-        <SectionHeader
-        isHero={true}
-          title="Join the network that puts pros first"
-          description="Quality leads. Fast payments. Zero bidding."
-        />
-        <div className="mt-8 w-full max-w-md">
-          <InputWithButton
-            placeholder="Enter your email"
-            buttonText="Get started"
-            buttonVariant="default"
-            buttonSize="lg"
-            buttonProps={{ className: "text-white" }}
+
+      {/* Hero section with scattered images in background */}
+      <div className="relative min-h-screen">
+        {/* Hero content */}
+        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-8">
+          <SectionHeader
+          isHero={true}
+            title="Join the network that puts pros first"
+            description="Quality leads. Fast payments. Zero bidding."
           />
+          <div className="mt-8 w-full max-w-md">
+            <InputWithButton
+              placeholder="Enter your email"
+              buttonText="Get started"
+              buttonVariant="default"
+              buttonSize="lg"
+              buttonProps={{ className: "text-white" }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* For all trades section - where images land and scroll */}
+      <div className="relative min-h-screen pt-16 pb-20 px-8" ref={tradesSectionRef}>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col items-center mb-16 relative z-10">
+            <SectionHeader
+              subtitle="Jack"
+              title="For all trades"
+              description="Jack has more than 100 thousand jobs available across 1000+ trades"
+            />
+          </div>
+          {/* Container for cards that will scroll infinitely - positioned right after header */}
+          <div className="relative h-[350px] w-full">
+            {/* Images will land here and scroll horizontally */}
+          </div>
         </div>
       </div>
       <div className="relative z-10 -mt-24 pt-12 pb-20 px-8" ref={(el) => { section2Ref.current = el }}>
@@ -378,65 +517,6 @@ export function NewPage() {
                   <CardDescription>Every job backed by comprehensive liability coverage. Work with confidence.x</CardDescription>
                 </CardHeader>
               </Card>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="relative z-10 pt-12 pb-20 px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col items-center mb-12">
-            <SectionHeader
-              subtitle="Jack"
-              title="For all trades"
-              description="Jack has more than 100 thousand jobs available across 1000+ trades"
-            />
-          </div>
-          <div className="overflow-hidden py-8 group max-w-7xl mx-auto">
-            <div className="flex gap-6 group-hover:[animation-play-state:paused] animate-scroll-infinite">
-              {[...Array(20)].map((_, index) => {
-                const tradeIndex = index % 10
-                const contractorImages = [
-                  '/contractors/22bd86e4bfc5e1aaaf264e774c349dff.jpg',
-                  '/contractors/56fe20dc1463de687448f7b05c5b9504.jpg',
-                  '/contractors/8abdf0e7b39201eab5992d6557bc1f0e.jpg',
-                  '/contractors/aa9c5fdbb24369cae69be61a261a1671.jpg',
-                  '/contractors/dc7ff51544b30db18f55c8ea63e635c0.jpg',
-                  '/contractors/dd745b0b0d6b5b434a383352f9cdc035.jpg',
-                  '/contractors/f36a8260df200c4b9da22216617ee32c.jpg',
-                  '/contractors/22bd86e4bfc5e1aaaf264e774c349dff.jpg',
-                  '/contractors/56fe20dc1463de687448f7b05c5b9504.jpg',
-                  '/contractors/8abdf0e7b39201eab5992d6557bc1f0e.jpg',
-                ]
-                const tradeNames = [
-                  'Handyman',
-                  'Plumber',
-                  'Technician',
-                  'Electrician',
-                  'Painter',
-                  'Carpenter',
-                  'Roofer',
-                  'HVAC Specialist',
-                  'Landscaper',
-                  'Flooring Expert'
-                ]
-                
-                return (
-                  <Card key={index} className="w-[290px] flex-shrink-0 overflow-hidden">
-                    <div className="w-full aspect-[4/5] overflow-hidden">
-                      <img 
-                        src={contractorImages[tradeIndex]} 
-                        alt={tradeNames[tradeIndex]}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <CardHeader>
-                      <CardTitle>{tradeNames[tradeIndex]}</CardTitle>
-                      <CardDescription>Discover opportunities in {tradeNames[tradeIndex].toLowerCase()}</CardDescription>
-                      <CardLink href="#">Get Started</CardLink>
-                    </CardHeader>
-                  </Card>
-                )
-              })}
             </div>
           </div>
         </div>
