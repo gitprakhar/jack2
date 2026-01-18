@@ -34,7 +34,7 @@ export function NewPage() {
 
     const mm = gsap.matchMedia()
 
-    mm.add("(min-width: 768px)", () => {
+    mm.add("(min-width: 1px)", () => {
       // Fixed scattered positions in hero (organic asymmetric pattern)
       // Opacity based on size ranges for depth perception
       // Small: 0.2, Medium: 0.4, Larger: 0.6, Largest: 0.8
@@ -444,7 +444,7 @@ export function NewPage() {
       {/* Hero section with scattered images in background */}
       <div className="relative min-h-screen">
         {/* Hero content */}
-        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-8">
+        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-8 md:px-8">
           <SectionHeader
           isHero={true}
             title="Join the network that puts pros first"
@@ -463,7 +463,7 @@ export function NewPage() {
       </div>
 
       {/* For all trades section - where images land and scroll */}
-      <div className="relative min-h-screen pt-20 pb-20 px-8" ref={tradesSectionRef}>
+      <div className="relative min-h-0 md:min-h-screen pt-12 md:pt-20 pb-20 px-8 md:px-8" ref={tradesSectionRef}>
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center mb-16 relative z-10">
             <SectionHeader
@@ -482,8 +482,8 @@ export function NewPage() {
           </div>
         </div>
       </div>
-      <div className="relative z-10 pt-20 pb-20 px-8" ref={(el) => { section2Ref.current = el }}>
-        <div className="max-w-7xl mx-auto flex flex-col items-center">
+      <div className="relative z-10 pt-12 md:pt-20 pb-20 px-8 md:px-8" ref={(el) => { section2Ref.current = el }}>
+        <div className="max-w-7xl mx-auto flex flex-col items-start md:items-center">
           <div 
             className="bg-white rounded-2xl p-12 w-full"
           >
@@ -575,7 +575,7 @@ export function NewPage() {
           </div>
         </div>
       </div>
-      <div className="relative z-10 pt-20 pb-20 px-8">
+      <div className="relative z-10 pt-20 pb-20 px-6 md:px-8">
         <div className="max-w-5xl mx-auto flex flex-col items-center">
           <SectionHeader
             subtitle="Process"
@@ -584,7 +584,7 @@ export function NewPage() {
           />
           <div className="mt-8 relative" ref={processContainerRef}>
             {lineCoords.x1 > 0 && lineCoords.x2 > lineCoords.x1 && (
-              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ overflow: 'visible' }}>
+              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 hidden md:block" style={{ overflow: 'visible' }}>
                 <line
                   x1={lineCoords.x1}
                   y1={lineCoords.y}
@@ -608,18 +608,19 @@ export function NewPage() {
                 `}</style>
               </svg>
             )}
-            <div className="grid grid-cols-3 gap-8 relative z-10" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-              <div className="flex flex-col items-center">
-                <Button ref={applyRef} variant="default" size="default" className="relative z-10 text-white">Apply</Button>
-                <p className="mt-3 text-sm text-gray-600 text-center">Tell us about your skills, experience, and the services you offer. Takes about 10 minutes.</p>
+            {/* Vertical line for mobile - removed */}
+            <div className="flex flex-col md:grid md:grid-cols-3 gap-8 relative z-10 w-full" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+              <div className="flex flex-col md:flex-col items-start md:items-center gap-4">
+                <Button ref={applyRef} variant="default" size="default" className="relative z-10 text-white flex-shrink-0 w-full md:w-auto">Apply</Button>
+                <p className="text-sm text-gray-600 text-left md:text-center md:mt-3">Tell us about your skills, experience, and the services you offer. Takes about 10 minutes.</p>
               </div>
-              <div className="flex flex-col items-center">
-                <Button ref={approvedRef} variant="outline" size="default" className="relative z-10">Get Approved</Button>
-                <p className="mt-3 text-sm text-gray-600 text-center">We review applications within 48 hours. Background check and verification included.</p>
+              <div className="flex flex-col md:flex-col items-start md:items-center gap-4">
+                <Button ref={approvedRef} variant="outline" size="default" className="relative z-10 flex-shrink-0 w-full md:w-auto">Get Approved</Button>
+                <p className="text-sm text-gray-600 text-left md:text-center md:mt-3">We review applications within 48 hours. Background check and verification included.</p>
               </div>
-              <div className="flex flex-col items-center">
-                <Button ref={earningRef} variant="outline" size="default" className="relative z-10">Start Earning</Button>
-                <p className="mt-3 text-sm text-gray-600 text-center">Get matched with homeowners in your area. Accept jobs via text and start earning.</p>
+              <div className="flex flex-col md:flex-col items-start md:items-center gap-4">
+                <Button ref={earningRef} variant="outline" size="default" className="relative z-10 flex-shrink-0 w-full md:w-auto">Start Earning</Button>
+                <p className="text-sm text-gray-600 text-left md:text-center md:mt-3">Get matched with homeowners in your area. Accept jobs via text and start earning.</p>
               </div>
             </div>
           </div>
@@ -627,7 +628,7 @@ export function NewPage() {
       </div>
       <div className="relative z-10 pt-20 pb-20">
         <div className="w-full flex flex-col items-center">
-          <div className="max-w-7xl mx-auto px-8 w-full">
+          <div className="max-w-7xl mx-auto px-8 md:px-8 w-full">
             <SectionHeader
               subtitle="Our Customers"
               title="Don't just take our word for it"
@@ -652,7 +653,7 @@ export function NewPage() {
               <div className="flex-shrink-0" style={{ width: 'calc(50% - 325px)' }}></div>
               <div 
                 ref={(el) => { testimonialRefs.current[0] = el }}
-                className="w-[700px] flex-shrink-0 snap-center transition-opacity duration-300"
+                className="w-[90vw] md:w-[700px] flex-shrink-0 snap-center transition-opacity duration-300"
                 style={{ opacity: centeredTestimonial === 0 ? 1 : 0.5 }}
               >
                 <Testimonial
@@ -665,7 +666,7 @@ export function NewPage() {
               </div>
               <div 
                 ref={(el) => { testimonialRefs.current[1] = el }}
-                className="w-[700px] flex-shrink-0 snap-center transition-opacity duration-300"
+                className="w-[90vw] md:w-[700px] flex-shrink-0 snap-center transition-opacity duration-300"
                 style={{ opacity: centeredTestimonial === 1 ? 1 : 0.5 }}
               >
                 <Testimonial
@@ -678,7 +679,7 @@ export function NewPage() {
               </div>
               <div 
                 ref={(el) => { testimonialRefs.current[2] = el }}
-                className="w-[700px] flex-shrink-0 snap-center transition-opacity duration-300"
+                className="w-[90vw] md:w-[700px] flex-shrink-0 snap-center transition-opacity duration-300"
                 style={{ opacity: centeredTestimonial === 2 ? 1 : 0.5 }}
               >
                 <Testimonial
@@ -694,7 +695,7 @@ export function NewPage() {
           </div>
         </div>
       </div>
-      <div className="relative z-10 pt-20 pb-20 px-8">
+      <div className="relative z-10 pt-20 pb-20 px-8 md:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="bg-white rounded-2xl p-12 w-full">
             <div className="flex flex-col items-center">
@@ -703,8 +704,8 @@ export function NewPage() {
                 description="We partner with licensed, insured professionals who deliver quality work."
                 maxWidth="full"
               />
-              <div className="mt-8 border border-none rounded-lg p-6">
-                <div className="grid grid-cols-3 gap-6">
+              <div className="mt-8 border border-none rounded-lg p-0">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2 mb-1">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-brand flex-shrink-0">
@@ -767,7 +768,7 @@ export function NewPage() {
       </div>
       
       {/* Final CTA section */}
-      <div className="relative z-10 pt-20 pb-20 px-8">
+      <div className="relative z-10 pt-20 pb-20 px-8 md:px-8">
         <div className="max-w-7xl mx-auto flex flex-col items-center">
           <SectionHeader
             title="Ready?"

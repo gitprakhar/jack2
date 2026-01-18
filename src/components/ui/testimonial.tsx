@@ -35,7 +35,7 @@ export const Testimonial = ({
     <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
       
       {/* Left side: Quote + Author */}
-      <div className="flex flex-col gap-6 text-center md:text-left">
+      <div className="flex flex-col gap-6 text-left md:text-left">
         <p className="text-2xl md:text-lg">{quote}</p>
         <div>
           <p className="font-semibold">{author}</p>
@@ -44,7 +44,7 @@ export const Testimonial = ({
       </div>
       
       {/* Right side: Button */}
-      <Button variant="secondary" size="lg" className="w-full md:w-auto mx-auto md:mx-0">{buttonText}</Button>
+      <Button variant="secondary" size="lg" className="w-full md:w-auto md:mx-0">{buttonText}</Button>
     </div>
   </CardContent>
 </Card>

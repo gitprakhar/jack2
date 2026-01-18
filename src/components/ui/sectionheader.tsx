@@ -43,7 +43,7 @@ export const SectionHeader = ({
   
   return (
     <div className={cn(
-      "text-center",
+      "text-left md:text-center",
       dark ? "text-white" : "text-black",
       className
     )}>
@@ -58,7 +58,7 @@ export const SectionHeader = ({
       )}
         <h2 className={cn(
           "font-serif",
-          isHero ? "text-7xl" : "text-5xl",
+          isHero ? "text-6xl md:text-7xl" : "text-5xl",
           (description || link) && "mb-6",
           dark && "text-white"
         )}>
