@@ -3,8 +3,7 @@ import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { SectionHeader } from "@/components/ui/sectionheader"
 import { InputWithButton } from "@/components/ui/input-with-button"
-import { Input } from "@/components/ui/input"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardLink } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Testimonial } from "@/components/ui/testimonial"
 import { Navbar } from "./ui/navbar"
@@ -45,7 +44,7 @@ export function NewPage() {
         { x: -800, y: -350, scale: 0.14, opacity: 0.4 },
         { x: -600, y: -280, scale: 0.10, opacity: 0.2 },
         { x: -450, y: -400, scale: 0.19, opacity: 0.6 },
-        { x: -900, y: -200, scale: 0.12, opacity: 0.2 },
+        { x: -1200, y: -600, scale: 0.12, opacity: 0.2 }, // Moved off-screen
         
         // Upper center-right
         { x: 150, y: -320, scale: 0.18, opacity: 0.6 },
@@ -54,12 +53,12 @@ export function NewPage() {
         
         // Far upper right (off-screen)
         { x: 1100, y: -450, scale: 0.08, opacity: 0.2 },
-        { x: 1300, y: -250, scale: 0.13, opacity: 0.2 },
+        { x: 1500, y: -700, scale: 0.13, opacity: 0.2 }, // Moved further off-screen
         
         // Middle left
         { x: -750, y: 50, scale: 0.15, opacity: 0.4 },
         { x: -550, y: -50, scale: 0.20, opacity: 0.8 },
-        { x: -350, y: 80, scale: 0.17, opacity: 0.6 },
+        { x: -1100, y: 100, scale: 0.17, opacity: 0.6 }, // Moved off-screen left
         
         // Center area (most visible)
         { x: -100, y: -400, scale: 0.22, opacity: 0.8 }, // Moved well above text
@@ -71,7 +70,7 @@ export function NewPage() {
         { x: 800, y: 450, scale: 0.19, opacity: 0.6 },
         
         // Far right (off-screen)
-        { x: 300, y: 200, scale: 0.12, opacity: 0.2 },
+        { x: 1400, y: 200, scale: 0.12, opacity: 0.2 }, // Moved further off-screen
         
         // Lower left
         { x: -700, y: 380, scale: 0.13, opacity: 0.2 },

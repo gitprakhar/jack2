@@ -13,7 +13,6 @@ export interface TestimonialProps {
 }
 
 export const Testimonial = ({
-  video,
   image,
   quote,
   author,
