@@ -6,8 +6,8 @@ export function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/new-page" element={<NewPage />} />
+        <Route path="/" element={<NewPage />} />
+        <Route path="/old-page" element={<HomePage />} />
       </Routes>
     </BrowserRouter>
   )
