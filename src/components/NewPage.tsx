@@ -7,12 +7,14 @@ import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardLink } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Testimonial } from "@/components/ui/testimonial"
+import { Navbar } from "./ui/navbar"
 
 export function NewPage() {
   const [visibleCards, setVisibleCards] = useState<boolean[]>([false, false, false, false])
   const [isSection2Visible, setIsSection2Visible] = useState(false)
   const [lineCoords, setLineCoords] = useState({ x1: 0, x2: 0, y: 0, length: 0 })
   const [centeredTestimonial, setCenteredTestimonial] = useState<number | null>(1)
+  const [showNavInput, setShowNavInput] = useState(false)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const section2Ref = useRef<HTMLDivElement | null>(null)
   const tradeImageRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -23,6 +25,7 @@ export function NewPage() {
   const processContainerRef = useRef<HTMLDivElement | null>(null)
   const testimonialRefs = useRef<(HTMLDivElement | null)[]>([])
   const testimonialContainerRef = useRef<HTMLDivElement | null>(null)
+  const heroInputRef = useRef<HTMLDivElement | null>(null)
 
   // GSAP ScrollTrigger animation for hero images to cards transformation
   useEffect(() => {
@@ -115,6 +118,9 @@ export function NewPage() {
         }
       })
 
+      // Variable to store infinite scroll animations
+      let scrollAnimations: gsap.core.Tween[] = []
+
       // Create scroll-triggered animation timeline for organizing cards
       const organizeTl = gsap.timeline({
         scrollTrigger: {
@@ -123,12 +129,35 @@ export function NewPage() {
           end: () => {
             const sectionTop = tradesSectionRef.current?.offsetTop || 1000
             const viewportHeight = window.innerHeight
-            // Complete animation when section is starting to come into view
-            // This gives enough scroll distance for a smooth, slower animation
-            return `+=${sectionTop + viewportHeight * 0.3}`
+            // Complete animation before section comes into view
+            // Images will be in position and scrolling before user reaches the section
+            return `+=${sectionTop - viewportHeight * 0.1}`
           },
           scrub: 1, // Smooth scrubbing
           markers: false,
+          onUpdate: (self) => {
+            // Start infinite scroll when animation is complete (progress = 1)
+            if (self.progress === 1 && scrollAnimations.length === 0) {
+              tradeImageRefs.current.forEach((ref) => {
+                if (ref) {
+                  const anim = gsap.to(ref, {
+                    x: "-=2000",
+                    duration: 60,
+                    ease: "none",
+                    repeat: -1,
+                    repeatDelay: 0,
+                    force3D: false,
+                  })
+                  scrollAnimations.push(anim)
+                }
+              })
+            }
+            // Stop infinite scroll when scrolling back before completion
+            if (self.progress < 1 && scrollAnimations.length > 0) {
+              scrollAnimations.forEach(anim => anim.kill())
+              scrollAnimations = []
+            }
+          },
         }
       })
 
@@ -149,35 +178,6 @@ export function NewPage() {
         }
       })
 
-      // Separate trigger to start infinite scroll after cards are fully in view
-      let scrollAnimations: gsap.core.Tween[] = []
-      
-      ScrollTrigger.create({
-        trigger: tradesSectionRef.current,
-        start: "center center",
-        onEnter: () => {
-          // Start infinite scroll only when section is centered - pure 2D
-          tradeImageRefs.current.forEach((ref) => {
-            if (ref) {
-              const anim = gsap.to(ref, {
-                x: "-=2000",
-                duration: 60, // Increased from 30 to 60 seconds for slower scroll
-                ease: "none",
-                repeat: -1,
-                repeatDelay: 0,
-                force3D: false, // Disable 3D transforms
-              })
-              scrollAnimations.push(anim)
-            }
-          })
-        },
-        onLeaveBack: () => {
-          // Stop infinite scroll when scrolling back up
-          scrollAnimations.forEach(anim => anim.pause())
-          scrollAnimations = []
-        },
-      })
-
       return () => {
         organizeTl.kill()
       }
@@ -186,6 +186,26 @@ export function NewPage() {
     return () => {
       mm.kill()
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+    }
+  }, [])
+
+  // Track when user scrolls past hero input
+  useEffect(() => {
+    const heroInput = heroInputRef.current
+    if (!heroInput) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Show nav input when hero input is out of view
+        setShowNavInput(!entry.isIntersecting)
+      },
+      { threshold: 0 }
+    )
+
+    observer.observe(heroInput)
+
+    return () => {
+      observer.disconnect()
     }
   }, [])
 
@@ -371,6 +391,9 @@ export function NewPage() {
 
   return (
     <div className="min-h-screen bg-[#faf9f5] relative overflow-hidden">
+      {/* Navbar */}
+      <Navbar showInput={showNavInput} />
+      
       {/* Scattered contractor images that will transform into cards - at root level to traverse sections */}
       <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
         {[...Array(25)].map((_, index) => {
@@ -428,7 +451,7 @@ export function NewPage() {
             title="Join the network that puts pros first"
             description="Quality leads. Fast payments. Zero bidding."
           />
-          <div className="mt-8 w-full max-w-md">
+          <div ref={heroInputRef} className="mt-8 w-full max-w-md">
             <InputWithButton
               placeholder="Enter your email"
               buttonText="Get started"
