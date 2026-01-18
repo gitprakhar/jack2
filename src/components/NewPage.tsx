@@ -697,9 +697,9 @@ export function NewPage() {
       </div>
       <div className="relative z-10 pt-20 pb-20 px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col items-center">
+          <div className="bg-white rounded-2xl p-12 w-full">
+            <div className="flex flex-col items-center">
               <SectionHeader
-                subtitle="Requirements"
                 title="All you need"
                 description="We partner with licensed, insured professionals who deliver quality work."
                 maxWidth="full"
@@ -763,6 +763,26 @@ export function NewPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Final CTA section */}
+      <div className="relative z-10 pt-20 pb-20 px-8">
+        <div className="max-w-7xl mx-auto flex flex-col items-center">
+          <SectionHeader
+            title="Ready?"
+            description="Join thousands of professionals earning more with less hassle. Apply now and start receiving quality leads within days."
+          />
+          <div className="mt-8 w-full max-w-md">
+            <InputWithButton
+              placeholder="Enter your email"
+              buttonText="Get started"
+              buttonVariant="default"
+              buttonSize="lg"
+              buttonProps={{ className: "text-white" }}
+            />
+          </div>
         </div>
       </div>
     </div>
