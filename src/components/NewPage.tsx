@@ -650,10 +650,10 @@ export function NewPage() {
               }
             `}</style>
             <div className="flex gap-8">
-              <div className="flex-shrink-0" style={{ width: 'calc(50% - 400px)' }}></div>
+              <div className="flex-shrink-0" style={{ width: 'calc(50% - 325px)' }}></div>
               <div 
                 ref={(el) => { testimonialRefs.current[0] = el }}
-                className="w-[800px] flex-shrink-0 snap-center transition-opacity duration-300"
+                className="w-[700px] flex-shrink-0 snap-center transition-opacity duration-300"
                 style={{ opacity: centeredTestimonial === 0 ? 1 : 0.5 }}
               >
                 <Testimonial
@@ -666,7 +666,7 @@ export function NewPage() {
               </div>
               <div 
                 ref={(el) => { testimonialRefs.current[1] = el }}
-                className="w-[800px] flex-shrink-0 snap-center transition-opacity duration-300"
+                className="w-[700px] flex-shrink-0 snap-center transition-opacity duration-300"
                 style={{ opacity: centeredTestimonial === 1 ? 1 : 0.5 }}
               >
                 <Testimonial
@@ -679,7 +679,7 @@ export function NewPage() {
               </div>
               <div 
                 ref={(el) => { testimonialRefs.current[2] = el }}
-                className="w-[800px] flex-shrink-0 snap-center transition-opacity duration-300"
+                className="w-[700px] flex-shrink-0 snap-center transition-opacity duration-300"
                 style={{ opacity: centeredTestimonial === 2 ? 1 : 0.5 }}
               >
                 <Testimonial
@@ -690,7 +690,7 @@ export function NewPage() {
                   title="Plumber"
                 />
               </div>
-              <div className="flex-shrink-0" style={{ width: 'calc(50% - 400px)' }}></div>
+              <div className="flex-shrink-0" style={{ width: 'calc(50% - 325px)' }}></div>
             </div>
           </div>
         </div>
