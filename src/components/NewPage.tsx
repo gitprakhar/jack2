@@ -59,29 +59,29 @@ export function NewPage() {
         { x: -350, y: 80, scale: 0.17, opacity: 0.6 },
         
         // Center area (most visible)
-        { x: -100, y: 20, scale: 0.22, opacity: 0.8 },
-        { x: 100, y: 100, scale: 0.18, opacity: 0.6 },
-        { x: 300, y: 50, scale: 0.14, opacity: 0.4 },
+        { x: -100, y: -400, scale: 0.22, opacity: 0.8 }, // Moved well above text
+        { x: 100, y: -150, scale: 0.18, opacity: 0.6 }, // Moved above text
+        { x: 300, y: -180, scale: 0.14, opacity: 0.4 }, // Moved above text
         
-        // Middle right
-        { x: 600, y: -80, scale: 0.16, opacity: 0.4 },
-        { x: 800, y: 120, scale: 0.19, opacity: 0.6 },
+        // Middle right - moved to lower right to avoid text
+        { x: 600, y: 380, scale: 0.16, opacity: 0.4 },
+        { x: 800, y: 450, scale: 0.19, opacity: 0.6 },
         
         // Far right (off-screen)
-        { x: 1200, y: 100, scale: 0.12, opacity: 0.2 },
+        { x: 300, y: 200, scale: 0.12, opacity: 0.2 },
         
         // Lower left
         { x: -700, y: 380, scale: 0.13, opacity: 0.2 },
         { x: -400, y: 420, scale: 0.17, opacity: 0.6 },
         
-        // Lower center
-        { x: -150, y: 450, scale: 0.15, opacity: 0.4 },
-        { x: 200, y: 480, scale: 0.18, opacity: 0.6 },
+        // Lower center - moved up to avoid input field
+        { x: -150, y: -900, scale: 0.15, opacity: 0.4 },
+        { x: 800, y: -250, scale: 0.18, opacity: 0.6 },
         
         // Lower right and far off-screen
-        { x: 500, y: 520, scale: 0.11, opacity: 0.2 },
-        { x: 900, y: 600, scale: 0.09, opacity: 0.2 },
-        { x: 1400, y: 400, scale: 0.14, opacity: 0.4 },
+        { x: 500, y: 20, scale: 0.11, opacity: 0.2 },
+        { x: 300, y: 60, scale: 0.09, opacity: 0.2 },
+        { x: 400, y: 100, scale: 0.14, opacity: 0.4 },
       ]
 
       // Sort positions by x coordinate (left to right) so rightmost stays rightmost
@@ -120,7 +120,13 @@ export function NewPage() {
         scrollTrigger: {
           trigger: "body",
           start: "top top", // Start immediately when page scroll begins
-          end: () => `+=${tradesSectionRef.current?.offsetTop || 1000}`, // End when reaching trades section
+          end: () => {
+            const sectionTop = tradesSectionRef.current?.offsetTop || 1000
+            const viewportHeight = window.innerHeight
+            // Complete animation when section is starting to come into view
+            // This gives enough scroll distance for a smooth, slower animation
+            return `+=${sectionTop + viewportHeight * 0.3}`
+          },
           scrub: 1, // Smooth scrubbing
           markers: false,
         }
@@ -435,13 +441,17 @@ export function NewPage() {
       </div>
 
       {/* For all trades section - where images land and scroll */}
-      <div className="relative min-h-screen pt-16 pb-20 px-8" ref={tradesSectionRef}>
+      <div className="relative min-h-screen pt-20 pb-20 px-8" ref={tradesSectionRef}>
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center mb-16 relative z-10">
             <SectionHeader
               subtitle="Jack"
               title="For all trades"
               description="Jack has more than 100 thousand jobs available across 1000+ trades"
+              link="Get started"
+              linkHref="#"
+              buttonVariant="default"
+              buttonSize="default"
             />
           </div>
           {/* Container for cards that will scroll infinitely - positioned right after header */}
@@ -450,7 +460,7 @@ export function NewPage() {
           </div>
         </div>
       </div>
-      <div className="relative z-10 -mt-24 pt-12 pb-20 px-8" ref={(el) => { section2Ref.current = el }}>
+      <div className="relative z-10 pt-20 pb-20 px-8" ref={(el) => { section2Ref.current = el }}>
         <div className="max-w-7xl mx-auto flex flex-col items-center">
           <div 
             className="bg-white rounded-2xl p-12 w-full"
@@ -543,7 +553,7 @@ export function NewPage() {
           </div>
         </div>
       </div>
-      <div className="relative z-10 pt-12 pb-20 px-8">
+      <div className="relative z-10 pt-20 pb-20 px-8">
         <div className="max-w-5xl mx-auto flex flex-col items-center">
           <SectionHeader
             subtitle="Process"
@@ -593,7 +603,7 @@ export function NewPage() {
           </div>
         </div>
       </div>
-      <div className="relative z-10 pt-12 pb-20">
+      <div className="relative z-10 pt-20 pb-20">
         <div className="w-full flex flex-col items-center">
           <div className="max-w-7xl mx-auto px-8 w-full">
             <SectionHeader
@@ -662,7 +672,7 @@ export function NewPage() {
           </div>
         </div>
       </div>
-      <div className="relative z-10 pt-12 pb-20 px-8">
+      <div className="relative z-10 pt-20 pb-20 px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center">
               <SectionHeader

@@ -77,7 +77,11 @@ export const SectionHeader = ({
           variant={buttonVariant}
           size={buttonSize}
           asChild
-          className={cn("font-sans", dark ? "text-[#a3a3a3]" : "")}
+          className={cn(
+            "font-sans", 
+            dark ? "text-[#a3a3a3]" : "",
+            buttonVariant === "default" ? "text-white" : ""
+          )}
         >
           <a href={linkHref}>
             {link}
