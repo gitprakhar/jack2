@@ -11,7 +11,7 @@ export const Navbar = ({ showInput = false }: NavbarProps) => {
       <div className="max-w-7xl mx-auto px-8 py-4">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
-          <a href="/" className="flex items-center">
+          <a href="/" className="flex items-center cursor-pointer">
             <img 
               src="/logo.png" 
               alt="Logo" 
