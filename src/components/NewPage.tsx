@@ -33,41 +33,55 @@ export function NewPage() {
     const mm = gsap.matchMedia()
 
     mm.add("(min-width: 768px)", () => {
-      // Fixed scattered positions in hero (nice spread-out pattern)
-      // Opacity strongly correlates with size for depth effect: larger = more opacity
+      // Fixed scattered positions in hero (organic asymmetric pattern)
+      // Opacity based on size ranges for depth perception
+      // Small: 0.2, Medium: 0.4, Larger: 0.6, Largest: 0.8
+      // More clustered pattern with asymmetric distribution
       const scatteredPositions: Array<{ x: number; y: number; scale: number; opacity: number }> = [
-        // Top row - smaller images = less opacity (background/far away)
-        { x: -1000, y: -450, scale: 0.10, opacity: 0.10 },
-        { x: -700, y: -480, scale: 0.14, opacity: 0.19 },
-        { x: -400, y: -420, scale: 0.12, opacity: 0.14 },
-        { x: -100, y: -500, scale: 0.08, opacity: 0.08 },
-        { x: 200, y: -450, scale: 0.18, opacity: 0.30 },
-        { x: 500, y: -480, scale: 0.11, opacity: 0.13 },
-        { x: 800, y: -420, scale: 0.15, opacity: 0.22 },
-        { x: 1100, y: -500, scale: 0.09, opacity: 0.10 },
+        // Upper left cluster
+        { x: -800, y: -350, scale: 0.14, opacity: 0.4 },
+        { x: -600, y: -280, scale: 0.10, opacity: 0.2 },
+        { x: -450, y: -400, scale: 0.19, opacity: 0.6 },
+        { x: -900, y: -200, scale: 0.12, opacity: 0.2 },
         
-        // Middle-upper row
-        { x: -950, y: -150, scale: 0.13, opacity: 0.17 },
-        { x: -600, y: -200, scale: 0.16, opacity: 0.25 },
-        { x: -250, y: -180, scale: 0.19, opacity: 0.33 },
-        { x: 100, y: -220, scale: 0.12, opacity: 0.14 },
-        { x: 450, y: -160, scale: 0.18, opacity: 0.30 },
-        { x: 750, y: -190, scale: 0.14, opacity: 0.19 },
-        { x: 1050, y: -170, scale: 0.11, opacity: 0.13 },
+        // Upper center-right
+        { x: 150, y: -320, scale: 0.18, opacity: 0.6 },
+        { x: 350, y: -280, scale: 0.16, opacity: 0.4 },
+        { x: 550, y: -380, scale: 0.11, opacity: 0.2 },
         
-        // Middle-lower row - larger images = more opacity (foreground/closer)
-        { x: -850, y: 200, scale: 0.17, opacity: 0.28 },
-        { x: -500, y: 150, scale: 0.20, opacity: 0.38 },
-        { x: -150, y: 180, scale: 0.15, opacity: 0.22 },
-        { x: 200, y: 220, scale: 0.22, opacity: 0.44 },
-        { x: 550, y: 170, scale: 0.18, opacity: 0.30 },
-        { x: 900, y: 190, scale: 0.16, opacity: 0.25 },
+        // Far upper right (off-screen)
+        { x: 1100, y: -450, scale: 0.08, opacity: 0.2 },
+        { x: 1300, y: -250, scale: 0.13, opacity: 0.2 },
         
-        // Bottom row
-        { x: -750, y: 450, scale: 0.13, opacity: 0.17 },
-        { x: -350, y: 480, scale: 0.19, opacity: 0.33 },
-        { x: 50, y: 500, scale: 0.14, opacity: 0.19 },
-        { x: 450, y: 470, scale: 0.17, opacity: 0.28 },
+        // Middle left
+        { x: -750, y: 50, scale: 0.15, opacity: 0.4 },
+        { x: -550, y: -50, scale: 0.20, opacity: 0.8 },
+        { x: -350, y: 80, scale: 0.17, opacity: 0.6 },
+        
+        // Center area (most visible)
+        { x: -100, y: 20, scale: 0.22, opacity: 0.8 },
+        { x: 100, y: 100, scale: 0.18, opacity: 0.6 },
+        { x: 300, y: 50, scale: 0.14, opacity: 0.4 },
+        
+        // Middle right
+        { x: 600, y: -80, scale: 0.16, opacity: 0.4 },
+        { x: 800, y: 120, scale: 0.19, opacity: 0.6 },
+        
+        // Far right (off-screen)
+        { x: 1200, y: 100, scale: 0.12, opacity: 0.2 },
+        
+        // Lower left
+        { x: -700, y: 380, scale: 0.13, opacity: 0.2 },
+        { x: -400, y: 420, scale: 0.17, opacity: 0.6 },
+        
+        // Lower center
+        { x: -150, y: 450, scale: 0.15, opacity: 0.4 },
+        { x: 200, y: 480, scale: 0.18, opacity: 0.6 },
+        
+        // Lower right and far off-screen
+        { x: 500, y: 520, scale: 0.11, opacity: 0.2 },
+        { x: 900, y: 600, scale: 0.09, opacity: 0.2 },
+        { x: 1400, y: 400, scale: 0.14, opacity: 0.4 },
       ]
 
       // Sort positions by x coordinate (left to right) so rightmost stays rightmost
